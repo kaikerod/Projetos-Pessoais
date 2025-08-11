@@ -1,32 +1,100 @@
-# Meus Projetos Pessoais
+# 📊 Dashboard de Ordens de Serviço
 
-Bem-vindo(a) ao meu repositório central de projetos pessoais! 👋
+Dashboard para controle e acompanhamento de ordens de serviço com sincronização em tempo real via Firebase.
 
-Este espaço foi criado com o objetivo de armazenar, documentar e compartilhar todos os projetos que desenvolvo em meu tempo livre. Aqui, você encontrará uma coleção diversificada de trabalhos, desde pequenos experimentos e scripts até aplicações mais completas.
+## 🚀 Funcionalidades
 
-O principal propósito deste repositório é servir como:
+- ✅ Adicionar registros de OS
+- 📊 Estatísticas em tempo real
+- 📈 Gráficos interativos
+- 🔍 Filtros e busca
+- 📅 Histórico mensal
+- ☁️ Sincronização em nuvem (Firebase)
+- 💾 Fallback para armazenamento local
 
-* **Um portfólio prático:** Demonstrando minhas habilidades e interesses em diferentes áreas da tecnologia.
-* **Um campo de aprendizado:** Onde testo novas ferramentas, linguagens e conceitos.
-* **Um registro do meu progresso:** Acompanhando minha evolução como desenvolvedor/criador.
+## ⚠️ Problema Atual: Erro ao Adicionar ao Firestore
 
-## 🚀 Navegação
+**Se você está recebendo erro ao adicionar dados ao Firestore, siga estas instruções:**
 
-Cada projeto está contido em seu próprio diretório. Dentro de cada um, você normalmente encontrará um `README.md` específico com detalhes sobre aquele projeto, como:
+### 🔧 Solução Rápida
 
-* A tecnologia utilizada.
-* O problema que ele resolve.
-* Como executá-lo localmente.
+1. **Abra o arquivo de teste**: `test-firebase.html`
+2. **Verifique o status da conexão** na página
+3. **Configure o Firebase** seguindo o guia completo
 
-Sinta-se à vontade para explorar, clonar, e se inspirar.
+### 📋 Passos para Configurar o Firebase
 
-## 📫 Contato
+1. **Acesse o Firebase Console**: [https://console.firebase.google.com](https://console.firebase.google.com)
+2. **Crie um projeto** ou use um existente
+3. **Ative o Firestore Database**
+4. **Configure as regras de segurança** (veja `FIREBASE-SETUP.md`)
+5. **Obtenha as configurações** do seu app web
+6. **Atualize o arquivo** `public/assets/firebase-config.js`
 
-Se tiver alguma dúvida, sugestão ou quiser bater um papo, pode me encontrar em:
+### 📖 Guia Completo
 
-* **LinkedIn:** `https://www.linkedin.com/in/kaike-rodrigues-0b8561358/`
-* **Email:** `kaikevinicius789@gmail.com`
+Para instruções detalhadas, consulte: **[FIREBASE-SETUP.md](FIREBASE-SETUP.md)**
 
+## 🧪 Teste de Conexão
 
+Use o arquivo `test-firebase.html` para:
+- ✅ Verificar se o Firebase está conectado
+- 📝 Testar escrita no Firestore
+- 📖 Testar leitura do Firestore
+- 🗑️ Limpar dados de teste
 
-Obrigado pela visita!
+## 🏃‍♂️ Como Executar
+
+### Desenvolvimento Local
+
+1. Clone o repositório
+2. Abra `public/index.html` no navegador
+3. Configure o Firebase (veja instruções acima)
+4. Teste a funcionalidade
+
+### Deploy no Vercel
+
+1. Conecte o repositório ao Vercel
+2. Configure as variáveis de ambiente se necessário
+3. Faça deploy automático
+
+## 🛠️ Tecnologias
+
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Banco de Dados**: Firebase Firestore
+- **Gráficos**: Chart.js
+- **Deploy**: Vercel
+- **Sincronização**: Firebase Realtime
+
+## 📱 Responsivo
+
+Interface adaptada para:
+- 🖥️ Desktop
+- 📱 Tablet
+- 📱 Mobile
+
+## 🔒 Segurança
+
+**⚠️ ATENÇÃO**: Configuração atual permite acesso total ao banco (modo desenvolvimento).
+
+Para produção, configure:
+- Autenticação de usuários
+- Regras de segurança restritivas
+- Limitação de acesso por domínio
+
+## 📞 Suporte
+
+Se encontrar problemas:
+
+1. **Verifique o console** do navegador (F12)
+2. **Use o arquivo de teste** `test-firebase.html`
+3. **Consulte o guia** `FIREBASE-SETUP.md`
+4. **Verifique as regras** do Firestore
+
+## 📄 Licença
+
+Este projeto é de uso interno para Samsung.
+
+---
+
+**🎯 Objetivo**: Dashboard compartilhado onde múltiplos usuários podem ver mudanças em tempo real via Firebase.
