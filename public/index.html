@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard de Ordens de Serviço</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Dashboard de Ordens de Serviço</h1>
+    </header>
+
+    <main class="container">
+      <section class="card form-card">
+        <h2>Novo Registro</h2>
+        <form id="entry-form" autocomplete="off">
+          <div class="form-grid">
+            <label>
+              Número da OS
+              <input type="text" id="osNumber" placeholder="Ex.: 123456" required />
+            </label>
+
+            <label>
+              Colaborador
+              <input type="text" id="collaboratorName" placeholder="Nome do colaborador" />
+            </label>
+
+            <label>
+              Tipo de trabalho
+              <select id="workType" required>
+                <option value="" disabled selected>Selecione...</option>
+                <option value="reparo">Reparo</option>
+                <option value="triagem">Triagem</option>
+                <option value="solicitacao_de_peca">Solicitação de peça</option>
+                <option value="saw">SAW</option>
+                <option value="reparo_recusado">Reparo recusado</option>
+                <option value="oqc">OQC</option>
+              </select>
+            </label>
+
+            <div class="form-actions">
+              <button type="submit" class="btn primary">Adicionar</button>
+              <button type="button" id="clearAll" class="btn danger outline">Limpar tudo</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section class="stats-grid" id="stats">
+        <!-- Cartões de estatísticas renderizados via JS -->
+      </section>
+
+      <section class="card chart-card" id="chartSection">
+        <canvas id="pieChart"></canvas>
+      </section>
+
+      <section class="card month-history-card" id="monthlyHistorySection">
+        <h2>Histórico Mensal</h2>
+        <p class="muted">Clique em um mês para filtrar a tabela e os gráficos.</p>
+        <div class="months-grid" id="monthsGrid"></div>
+      </section>
+
+      <section class="toolbar card">
+        <div class="toolbar-left" style="width:100%">
+          <label class="search" style="width:100%">
+            <input type="text" id="searchInput" placeholder="Filtrar por número da OS, tipo ou colaborador..." />
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Data/Hora</th>
+                <th>Número da OS</th>
+                <th>Colaborador</th>
+                <th>Tipo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="entriesTableBody">
+              <!-- Registros renderizados via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <small id="dataSourceInfo">Dados salvos apenas neste navegador (localStorage).</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="assets/firebase-config.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+  </html>
+
+
