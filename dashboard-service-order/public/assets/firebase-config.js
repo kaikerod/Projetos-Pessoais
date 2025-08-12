@@ -1,6 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAPBFY5AC5eO1qko50U79Pd25N9jVb4UM8",
   authDomain: "dashboard-service-order.firebaseapp.com",
@@ -12,10 +10,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 
-// Initialize Realtime Database and get a reference to the service
+const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-// Export the database reference for use in other files
-export { database, ref, set, get, child };
+export { database };
