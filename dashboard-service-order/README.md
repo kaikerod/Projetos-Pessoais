@@ -93,7 +93,7 @@ Se encontrar problemas:
 
 ## 📄 Licença
 
-Este projeto é de uso interno para Samsung.
+Este projeto é de uso interno para Infinity Center Plus.
 
 ---
 
