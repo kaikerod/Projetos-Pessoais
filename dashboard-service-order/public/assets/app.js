@@ -1,15 +1,13 @@
-import { database } from './firebase-config.js';
-import { ref, set, get, onValue, push, remove } from 'firebase/database';
-
-// Constants
-const WORK_TYPES = [
-  { key: 'reparo', label: 'Reparo' },
-  { key: 'triagem', label: 'Triagem' },
-  { key: 'solicitacao_de_peca', label: 'Solicitação de peça' },
-  { key: 'saw', label: 'SAW' },
-  { key: 'reparo_recusado', label: 'Reparo recusado' },
-  { key: 'oqc', label: 'OQC' },
-];
+(() => {
+  const STORAGE_KEY = 'dashboardEntries';
+  const WORK_TYPES = [
+    { key: 'reparo', label: 'Reparo' },
+    { key: 'triagem', label: 'Triagem' },
+    { key: 'solicitacao_de_peca', label: 'Solicitação de peça' },
+    { key: 'saw', label: 'SAW' },
+    { key: 'reparo_recusado', label: 'Reparo recusado' },
+    { key: 'oqc', label: 'OQC' },
+  ];
 
   let entries = [];
   let currentFilter = '';
@@ -33,39 +31,23 @@ const WORK_TYPES = [
   let currentMonthKey = '';
 
   // Firebase/Cloud
-  import { database } from './firebase-config.js';
-  import { ref, set, get, onValue } from 'firebase/database';
-  
   let isCloudEnabled = false;
+  let db = null;
   let unsubscribe = null;
 
   function tryInitializeFirebase() {
     try {
-      if (!database) {
+      const cfg = (window && window.FIREBASE_CONFIG) || null;
+      
+      // Verifica se a configuração é válida
+      if (!cfg || !cfg.apiKey || !cfg.projectId) {
         console.warn('⚠️ Configuração do Firebase inválida ou incompleta');
         return false;
       }
-
-      // Configure real-time listener for entries
-      const entriesRef = ref(database, 'entries');
-      unsubscribe = onValue(entriesRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          entries = Object.values(data);
-          renderEntries();
-          updateStats();
-          updateCharts();
-        }
-      });
-
-      isCloudEnabled = true;
-      console.log('✅ Firebase inicializado com sucesso!');
-      return true;
-    } catch (error) {
-      console.error('❌ Erro ao inicializar Firebase:', error);
-      return false;
-    }
-  }
+      
+      // Verifica se não são valores placeholder
+      if (cfg.apiKey === 'AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' || 
+          cfg.projectId === 'SEU_PROJETO_ID' ||
           cfg.apiKey.includes('XXXXX')) {
         console.warn('⚠️ Configuração do Firebase ainda contém valores placeholder');
         return false;
