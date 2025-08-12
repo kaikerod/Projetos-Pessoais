@@ -1,4 +1,4 @@
-# Configuração do Firebase para o Dashboard Samsung
+# Configuração do Firebase para a Dashboard
 
 Este guia te ajudará a configurar o Firebase corretamente para que o dashboard funcione com sincronização em tempo real.
 
@@ -8,7 +8,7 @@ Este guia te ajudará a configurar o Firebase corretamente para que o dashboard 
 
 1. Acesse [https://console.firebase.google.com](https://console.firebase.google.com)
 2. Clique em "Criar projeto"
-3. Digite o nome: `dashboard-samsung-bce2b` (ou outro nome de sua preferência)
+3. Digite o nome do projeto
 4. Desative o Google Analytics (opcional)
 5. Clique em "Criar projeto"
 
@@ -45,7 +45,7 @@ service cloud.firestore {
 2. Selecione "Configurações do projeto"
 3. Role para baixo até "Seus aplicativos"
 4. Clique no ícone da web (</>)
-5. Digite um nome para o app (ex: "Dashboard Samsung")
+5. Digite um nome para o app (ex: "Dashboard")
 6. Clique em "Registrar app"
 
 ### 5. Copiar Configuração
