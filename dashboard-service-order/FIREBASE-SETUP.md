@@ -12,27 +12,26 @@ Este guia te ajudará a configurar o Firebase corretamente para que o dashboard 
 4. Desative o Google Analytics (opcional)
 5. Clique em "Criar projeto"
 
-### 2. Ativar o Firestore Database
+### 2. Ativar o Realtime Database
 
-1. No menu lateral, clique em "Firestore Database"
+1. No menu lateral, clique em "Realtime Database"
 2. Clique em "Criar banco de dados"
 3. Escolha "Iniciar no modo de teste" (para desenvolvimento)
 4. Escolha a localização mais próxima (ex: `us-central1`)
 5. Clique em "Ativar"
 
+Nota: O URL do seu banco de dados será semelhante a: `https://seu-projeto-default-rtdb.firebaseio.com`
+
 ### 3. Configurar Regras de Segurança
 
-1. Na aba "Regras" do Firestore, substitua o conteúdo por:
+1. Na aba "Regras" do Realtime Database, substitua o conteúdo por:
 
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /entries/{document} {
-      // Permite leitura e escrita para todos (modo de desenvolvimento)
-      // IMPORTANTE: Em produção, configure autenticação adequada
-      allow read, write: if true;
-    }
+```json
+{
+  "rules": {
+    ".read": true,  // Permite leitura para todos (modo de desenvolvimento)
+    ".write": true  // Permite escrita para todos (modo de desenvolvimento)
+    // IMPORTANTE: Em produção, configure regras mais restritas e autenticação adequada
   }
 }
 ```
@@ -71,14 +70,25 @@ const firebaseConfig = {
 2. Substitua os valores placeholder pelos valores reais:
 
 ```javascript
-window.FIREBASE_CONFIG = {
+// Importe os módulos necessários
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, get, child } from "firebase/database";
+
+const firebaseConfig = {
   apiKey: "SUA_API_KEY_REAL",
   authDomain: "SEU_PROJETO.firebaseapp.com",
+  databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
   projectId: "SEU_PROJETO_ID",
   storageBucket: "SEU_PROJETO.appspot.com",
   messagingSenderId: "SEU_SENDER_ID",
   appId: "SEU_APP_ID"
 };
+
+// Inicialize o Firebase
+const app = initializeApp(firebaseConfig);
+
+// Inicialize o Realtime Database
+const database = getDatabase(app);
 ```
 
 ### 7. Testar
@@ -97,6 +107,36 @@ window.FIREBASE_CONFIG = {
 ### Erro: "Configuração inválida"
 - Verifique se todos os campos estão preenchidos
 - Confirme se não há espaços extras
+- Certifique-se de que o `databaseURL` está correto
+
+### Exemplos de Uso do Realtime Database
+
+```javascript
+// Exemplo de como escrever dados
+function writeData(path, data) {
+  const reference = ref(database, path);
+  set(reference, data);
+}
+
+// Exemplo de como ler dados
+async function readData(path) {
+  const dbRef = ref(database);
+  try {
+    const snapshot = await get(child(dbRef, path));
+    if (snapshot.exists()) {
+      return snapshot.val();
+    }
+    return null;
+  } catch (error) {
+    console.error("Erro ao ler dados:", error);
+    throw error;
+  }
+}
+
+// Uso:
+// writeData('users/123', { name: 'João', email: 'joao@email.com' });
+// const data = await readData('users/123');
+```
 
 ### Erro: "Permissão negada"
 - Verifique as regras do Firestore
