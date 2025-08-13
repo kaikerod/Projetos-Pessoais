@@ -1,6 +1,6 @@
 # 📊 Dashboard de Ordens de Serviço
 
-Dashboard para controle e acompanhamento de ordens de serviço com sincronização em tempo real via Firebase.
+Dashboard para controle e acompanhamento de ordens de serviço com sincronização em tempo real com AWS DynamoDB.
 
 ## 🚀 Funcionalidades
 
@@ -9,39 +9,31 @@ Dashboard para controle e acompanhamento de ordens de serviço com sincronizaç�
 - 📈 Gráficos interativos
 - 🔍 Filtros e busca
 - 📅 Histórico mensal
-- ☁️ Sincronização em nuvem (Firebase)
-- 💾 Fallback para armazenamento local
+- 💾 Armazenamento local persistente
+- 🔄 Atualizações em tempo real
 
-## ⚠️ Problema Atual: Erro ao Adicionar ao Firestore
+## 💾 Armazenamento Local
 
-**Se você está recebendo erro ao adicionar dados ao Firestore, siga estas instruções:**
+A aplicação utiliza o **LocalStorage** do navegador para:
 
-### 🔧 Solução Rápida
+- ✅ Salvar todos os registros de OS
+- 📊 Manter estatísticas entre sessões
+- 🔒 Dados persistentes mesmo após fechar o navegador
+- 📱 Funcionamento offline
 
-1. **Abra o arquivo de teste**: `test-firebase.html`
-2. **Verifique o status da conexão** na página
-3. **Configure o Firebase** seguindo o guia completo
+### ⚠️ Importante
 
-### 📋 Passos para Configurar o Firebase
+- Os dados são salvos apenas no navegador atual
+- Limpar o cache do navegador apagará os dados
+- Faça backup dos dados importantes regularmente
 
-1. **Acesse o Firebase Console**: [https://console.firebase.google.com](https://console.firebase.google.com)
-2. **Crie um projeto** ou use um existente
-3. **Ative o Firestore Database**
-4. **Configure as regras de segurança** (veja `FIREBASE-SETUP.md`)
-5. **Obtenha as configurações** do seu app web
-6. **Atualize o arquivo** `public/assets/firebase-config.js`
+### � Backup e Restauração
 
-### 📖 Guia Completo
+Para fazer backup dos seus dados:
 
-Para instruções detalhadas, consulte: **[FIREBASE-SETUP.md](FIREBASE-SETUP.md)**
-
-## 🧪 Teste de Conexão
-
-Use o arquivo `test-firebase.html` para:
-- ✅ Verificar se o Firebase está conectado
-- 📝 Testar escrita no Firestore
-- 📖 Testar leitura do Firestore
-- 🗑️ Limpar dados de teste
+1. Abra o Console do Navegador (F12)
+2. Execute: `localStorage.getItem('dashboardEntries')`
+3. Copie e salve o resultado em um arquivo
 
 ## 🏃‍♂️ Como Executar
 
@@ -49,22 +41,20 @@ Use o arquivo `test-firebase.html` para:
 
 1. Clone o repositório
 2. Abra `public/index.html` no navegador
-3. Configure o Firebase (veja instruções acima)
-4. Teste a funcionalidade
+3. Comece a adicionar registros
 
-### Deploy no Vercel
+### Deploy
 
-1. Conecte o repositório ao Vercel
-2. Configure as variáveis de ambiente se necessário
-3. Faça deploy automático
+1. Faça upload dos arquivos para qualquer servidor web
+2. Não é necessária configuração adicional
+3. Funciona em qualquer host estático
 
 ## 🛠️ Tecnologias
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Banco de Dados**: Firebase Firestore
+- **Armazenamento**: LocalStorage API
 - **Gráficos**: Chart.js
-- **Deploy**: Vercel
-- **Sincronização**: Firebase Realtime
+- **Compatibilidade**: Todos navegadores modernos
 
 ## 📱 Responsivo
 
@@ -73,23 +63,22 @@ Interface adaptada para:
 - 📱 Tablet
 - 📱 Mobile
 
-## 🔒 Segurança
+## 🔒 Privacidade
 
-**⚠️ ATENÇÃO**: Configuração atual permite acesso total ao banco (modo desenvolvimento).
-
-Para produção, configure:
-- Autenticação de usuários
-- Regras de segurança restritivas
-- Limitação de acesso por domínio
+**✅ BENEFÍCIOS**: 
+- Dados salvos localmente
+- Sem compartilhamento externo
+- Sem necessidade de login
+- Funcionamento offline completo
 
 ## 📞 Suporte
 
 Se encontrar problemas:
 
 1. **Verifique o console** do navegador (F12)
-2. **Use o arquivo de teste** `test-firebase.html`
-3. **Consulte o guia** `FIREBASE-SETUP.md`
-4. **Verifique as regras** do Firestore
+2. **Verifique o LocalStorage** na aba Application do DevTools
+3. **Limpe o cache** se necessário
+4. **Faça backup** dos dados importantes
 
 ## 📄 Licença
 
@@ -97,4 +86,4 @@ Este projeto é de uso interno para Infinity Center Plus.
 
 ---
 
-**🎯 Objetivo**: Dashboard compartilhado onde múltiplos usuários podem ver mudanças em tempo real via Firebase.
+**🎯 Objetivo**: Dashboard simples e eficiente para controle de ordens de serviço com armazenamento local.
