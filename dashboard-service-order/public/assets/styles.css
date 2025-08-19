@@ -53,6 +53,7 @@ body {
 }
 .form-grid label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
 .form-grid input[type="text"],
+.form-grid input[type="number"],
 .form-grid select,
 .search input[type="text"] {
   width: 100%;
@@ -145,9 +146,10 @@ tbody tr:hover { background: rgba(255,255,255,.02); }
 .tag.reparo { border-color: #60a5fa; color: #93c5fd; }
 .tag.triagem { border-color: #34d399; color: #9ae6b4; }
 .tag.solicitacao_de_peca { border-color: #fbbf24; color: #fde68a; }
+.tag.orcamento_gerado { border-color: #f472b6; color: #f9a8d4; }
 .tag.saw { border-color: #a78bfa; color: #c4b5fd; }
 .tag.reparo_recusado { border-color: #f87171; color: #fecaca; }
-.tag.oqc { border-color: #22d3ee; color: #a5f3fc; }
+.tag.oqc { border-color: #fb923c; color: #fcd34d; }
 
 .row-actions { display: flex; gap: 8px; }
 .link-like { background: transparent; border: none; color: #93c5fd; cursor: pointer; padding: 0; }

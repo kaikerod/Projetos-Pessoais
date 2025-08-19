@@ -18,12 +18,12 @@
           <div class="form-grid">
             <label>
               Número da OS
-              <input type="text" id="osNumber" placeholder="Ex: 123456" required />
+              <input type="number" id="osNumber" placeholder="Ex: 123456" required />
             </label>
 
             <label>
               Colaborador
-              <input type="text" id="collaboratorName" placeholder="Nome do colaborador" />
+              <input type="text" id="collaboratorName" placeholder="Nome do colaborador" pattern="[A-Za-z\s]+" requiredarru />
             </label>
 
             <label>
@@ -33,6 +33,7 @@
                 <option value="reparo">Reparo</option>
                 <option value="triagem">Triagem</option>
                 <option value="solicitacao_de_peca">Solicitação de peça</option>
+                <option value="orcamento_gerado">Orçamento gerado</option>
                 <option value="saw">SAW</option>
                 <option value="reparo_recusado">Reparo recusado</option>
                 <option value="oqc">OQC</option>

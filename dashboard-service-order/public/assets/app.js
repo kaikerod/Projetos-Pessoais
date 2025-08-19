@@ -4,6 +4,7 @@
     { key: 'reparo', label: 'Reparo' },
     { key: 'triagem', label: 'Triagem' },
     { key: 'solicitacao_de_peca', label: 'Solicitação de peça' },
+    { key: 'orcamento_gerado', label: 'Orçamento gerado' },
     { key: 'saw', label: 'SAW' },
     { key: 'reparo_recusado', label: 'Reparo recusado' },
     { key: 'oqc', label: 'OQC' },
@@ -84,7 +85,7 @@
     if (!pieCanvas) return;
     const labels = WORK_TYPES.map((t) => t.label);
     const data = WORK_TYPES.map((t) => countByType[t.key] || 0);
-    const colors = ['#60a5fa', '#34d399', '#fbbf24', '#a78bfa', '#f87171', '#22d3ee'];
+    const colors = ['#60a5fa', '#34d399', '#fbbf24', '#f472b6', '#a78bfa', '#f87171', '#fb923c', '#22d3ee'];
     const colorsBg = colors.map((c) => hexToRgba(c, 0.25));
 
     const total = data.reduce((a, b) => a + b, 0);
