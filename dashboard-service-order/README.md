@@ -37,6 +37,8 @@ Para fazer backup dos seus dados:
 
 ## 🏃‍♂️ Como Executar
 
+Atualmente, a aplicação roda localmente, mas estou em processo de configuração do banco de dados DynamoDB da AWS para sincronização em nuvem.
+
 ### Desenvolvimento Local
 
 1. Clone o repositório
