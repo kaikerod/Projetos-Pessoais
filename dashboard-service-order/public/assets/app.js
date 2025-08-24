@@ -1,35 +1,27 @@
 (() => {
   const STORAGE_KEY = 'dashboardEntries';
   const WORK_TYPES = [
-    { key: 'reparo', label: 'Reparo' },
-    { key: 'triagem', label: 'Triagem' },
-    { key: 'solicitacao_de_peca', label: 'Solicitação de peça' },
-    { key: 'orcamento_gerado', label: 'Orçamento gerado' },
-    { key: 'saw', label: 'SAW' },
-    { key: 'reparo_recusado', label: 'Reparo recusado' },
-    { key: 'oqc', label: 'OQC' },
+    { key: 'triagem', label: 'Triagem', color: '#34d399' },
+    { key: 'solicitacao_de_peca', label: 'Solicitação de peça', color: '#fbbf24' },
+    { key: 'reparo', label: 'Reparo', color: '#60a5fa' },
+    { key: 'orcamento_gerado', label: 'Orçamento gerado', color: '#f472b6' },
+    { key: 'saw', label: 'SAW', color: '#a78bfa' },
+    { key: 'reparo_recusado', label: 'Reparo recusado', color: '#f87171' },
+    { key: 'reparo_completo', label: 'Reparo Completo', color: '#fb923c' },
   ];
 
   let entries = [];
-  let currentFilter = '';
 
   const form = document.getElementById('entry-form');
   const osNumberInput = document.getElementById('osNumber');
   const workTypeSelect = document.getElementById('workType');
   const collaboratorInput = document.getElementById('collaboratorName');
   const clearAllBtn = document.getElementById('clearAll');
-  const searchInput = document.getElementById('searchInput');
-  const tableBody = document.getElementById('entriesTableBody');
   const statsContainer = document.getElementById('stats');
   const pieCanvas = document.getElementById('pieChart');
   const chartSection = document.getElementById('chartSection');
-  const dataSourceInfo = document.getElementById('dataSourceInfo');
+  const board = document.getElementById('board');
   let pieChartInstance = null;
-
-  // Histórico mensal
-  const monthsGrid = document.getElementById('monthsGrid');
-  const monthlyHistorySection = document.getElementById('monthlyHistorySection');
-  let currentMonthKey = '';
 
   function loadEntriesFromStorage() {
     try {
@@ -63,9 +55,8 @@
   }
 
   function renderStats() {
-    const visibleEntries = filterEntriesByMonth(entries, currentMonthKey);
     const countByType = WORK_TYPES.reduce((acc, t) => ({ ...acc, [t.key]: 0 }), {});
-    for (const e of visibleEntries) {
+    for (const e of entries) {
       if (countByType[e.type] !== undefined) countByType[e.type] += 1;
     }
     statsContainer.innerHTML = WORK_TYPES.map((t) => {
@@ -78,14 +69,13 @@
     }).join('');
 
     renderPieChart(countByType);
-    renderMonthlyHistory();
   }
 
   function renderPieChart(countByType) {
     if (!pieCanvas) return;
     const labels = WORK_TYPES.map((t) => t.label);
     const data = WORK_TYPES.map((t) => countByType[t.key] || 0);
-    const colors = ['#60a5fa', '#34d399', '#fbbf24', '#f472b6', '#a78bfa', '#f87171', '#fb923c', '#22d3ee'];
+    const colors = WORK_TYPES.map((t) => t.color);
     const colorsBg = colors.map((c) => hexToRgba(c, 0.25));
 
     const total = data.reduce((a, b) => a + b, 0);
@@ -134,37 +124,41 @@
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
-  function renderTable() {
-    const filter = currentFilter.trim().toLowerCase();
-    const filteredByMonth = filterEntriesByMonth(entries, currentMonthKey);
-    const filtered = filteredByMonth.filter((e) => {
-      if (!filter) return true;
-      const typeLabel = getTypeLabel(e.type).toLowerCase();
-      return (
-        String(e.osNumber).toLowerCase().includes(filter) ||
-        typeLabel.includes(filter) ||
-        String(e.collaborator || '').toLowerCase().includes(filter)
-      );
+  function renderBoard() {
+    if (!board) return;
+
+    board.innerHTML = WORK_TYPES.map(type => `
+      <div class="board-column" data-type="${type.key}">
+        <div class="column-header" style="color: ${type.color};">
+          ${type.label}
+          <span class="column-count">(${entries.filter(e => e.type === type.key).length})</span>
+        </div>
+        <div class="column-body" id="column-${type.key}">
+          <!-- Cards will be rendered here -->
+        </div>
+      </div>
+    `).join('');
+
+    entries.forEach(entry => {
+      const columnBody = document.getElementById(`column-${entry.type}`);
+      if (columnBody) {
+        const card = document.createElement('div');
+        card.className = 'entry-card';
+        card.draggable = true;
+        card.dataset.id = entry.id;
+        card.innerHTML = `
+          <div class="os-number">OS: ${escapeHtml(String(entry.osNumber))}</div>
+          <div class="collaborator">${escapeHtml(String(entry.collaborator || ''))}</div>
+          <div class="timestamp">${formatDateTime(entry.timestamp)}</div>
+          <div class="actions">
+            <button class="link-like" data-action="delete" data-id="${entry.id}">Excluir</button>
+          </div>
+        `;
+        columnBody.appendChild(card);
+      }
     });
 
-    // Ordena mais recentes primeiro
-    filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-    tableBody.innerHTML = filtered.map((e) => {
-      const typeClass = e.type;
-      return `
-        <tr>
-          <td>${formatDateTime(e.timestamp)}</td>
-          <td>${escapeHtml(String(e.osNumber))}</td>
-          <td>${escapeHtml(String(e.collaborator || ''))}</td>
-          <td><span class="tag ${typeClass}">${escapeHtml(getTypeLabel(e.type))}</span></td>
-          <td class="row-actions">
-            <button class="link-like" data-action="delete" data-id="${e.id}">Excluir</button>
-          </td>
-        </tr>
-      `;
-    }).join('');
-    renderMonthlyHistory();
+    addDragAndDropListeners();
   }
 
   function escapeHtml(text) {
@@ -189,7 +183,7 @@
     entries.push(entry);
     saveEntriesToStorage();
     renderStats();
-    renderTable();
+    renderBoard();
     
     showNotification('✅ Registro adicionado com sucesso!', 'success');
   }
@@ -251,7 +245,7 @@
       entries.splice(idx, 1);
       saveEntriesToStorage();
       renderStats();
-      renderTable();
+      renderBoard();
       showNotification('🗑️ Registro excluído com sucesso!', 'info');
     }
   }
@@ -261,73 +255,72 @@
     entries = [];
     saveEntriesToStorage();
     renderStats();
-    renderTable();
+    renderBoard();
     showNotification('🗑️ Todos os registros foram excluídos!', 'info');
   }
 
-  // Auxiliares de mês
-  function getMonthKey(isoOrDate) {
-    const d = (isoOrDate instanceof Date) ? isoOrDate : new Date(isoOrDate);
-    if (isNaN(d.getTime())) return '';
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    return `${y}-${m}`;
+  function updateEntryType(id, newType) {
+    const entry = entries.find(e => e.id === id);
+    if (entry) {
+      entry.type = newType;
+      saveEntriesToStorage();
+      renderStats();
+      renderBoard();
+      showNotification(`Status da OS ${entry.osNumber} alterado para ${getTypeLabel(newType)}`, 'success');
+    }
   }
 
-  function formatMonthLabel(monthKey) {
-    const [y, m] = monthKey.split('-').map((v) => parseInt(v, 10));
-    if (!y || !m) return 'Inválido';
-    return `${String(m).padStart(2, '0')}/${y}`;
-  }
+  let draggedCard = null;
 
-  function filterEntriesByMonth(list, monthKey) {
-    if (!monthKey) return list.slice();
-    return list.filter((e) => getMonthKey(e.timestamp) === monthKey);
-  }
+  function addDragAndDropListeners() {
+    const cards = document.querySelectorAll('.entry-card');
+    cards.forEach(card => {
+      card.addEventListener('dragstart', (e) => {
+        draggedCard = card;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', card.dataset.id);
+      });
 
-  function renderMonthlyHistory() {
-    if (!monthsGrid || !monthlyHistorySection) return;
-    if (!entries || entries.length === 0) {
-      monthlyHistorySection.classList.add('is-hidden');
-      return;
-    }
+      card.addEventListener('dragend', () => {
+        draggedCard.classList.remove('dragging');
+        draggedCard = null;
+      });
+    });
 
-    // Agrupa por mês
-    const counts = new Map();
-    for (const e of entries) {
-      const key = getMonthKey(e.timestamp);
-      if (!key) continue;
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
+    const columns = document.querySelectorAll('.board-column');
+    columns.forEach(column => {
+      column.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const columnBody = column.querySelector('.column-body');
+        const dragging = document.querySelector('.dragging');
+        if (dragging && columnBody && !columnBody.contains(dragging)) {
+          columnBody.classList.add('drop-zone');
+        }
+        e.dataTransfer.dropEffect = 'move';
+      });
 
-    const keys = Array.from(counts.keys()).sort().reverse();
-    if (keys.length === 0) {
-      monthlyHistorySection.classList.add('is-hidden');
-      return;
-    }
-    monthlyHistorySection.classList.remove('is-hidden');
+      column.addEventListener('dragleave', (e) => {
+        const columnBody = column.querySelector('.column-body');
+        if (columnBody) {
+          columnBody.classList.remove('drop-zone');
+        }
+      });
 
-    const totalCount = entries.length;
-    const cardsHtml = [
-      `
-      <div class="month-card ${currentMonthKey ? '' : 'is-active'}" data-month="">
-        <div class="month">Todos</div>
-        <div class="count">${totalCount} registros</div>
-      </div>
-      `,
-      ...keys.map((k) => {
-        const active = currentMonthKey === k ? 'is-active' : '';
-        const n = counts.get(k) || 0;
-        return `
-          <div class="month-card ${active}" data-month="${k}">
-            <div class="month">${formatMonthLabel(k)}</div>
-            <div class="count">${n} registros</div>
-          </div>
-        `;
-      })
-    ].join('');
+      column.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const columnBody = column.querySelector('.column-body');
+        if (columnBody) {
+          columnBody.classList.remove('drop-zone');
+        }
 
-    monthsGrid.innerHTML = cardsHtml;
+        if (draggedCard) {
+          const entryId = draggedCard.dataset.id;
+          const newType = column.dataset.type;
+          updateEntryType(entryId, newType);
+        }
+      });
+    });
   }
 
   // Eventos
@@ -343,25 +336,7 @@
 
   clearAllBtn.addEventListener('click', clearAll);
 
-  searchInput.addEventListener('input', (e) => {
-    currentFilter = e.target.value;
-    renderTable();
-  });
-
-  if (monthsGrid) {
-    monthsGrid.addEventListener('click', (e) => {
-      const card = e.target.closest('.month-card');
-      if (!card) return;
-      const month = card.getAttribute('data-month') || '';
-      // Toggle se clicar novamente no ativo
-      currentMonthKey = (currentMonthKey === month) ? '' : month;
-      renderStats();
-      renderTable();
-      renderMonthlyHistory();
-    });
-  }
-
-  tableBody.addEventListener('click', (e) => {
+  board.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');
     if (!btn) return;
     const { action, id } = btn.dataset;
@@ -371,5 +346,5 @@
   // Init
   loadEntriesFromStorage();
   renderStats();
-  renderTable();
+  renderBoard();
 })();

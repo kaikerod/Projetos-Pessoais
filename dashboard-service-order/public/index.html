@@ -30,13 +30,13 @@
               Tipo de trabalho
               <select id="workType" required>
                 <option value="" disabled selected>Selecione...</option>
-                <option value="reparo">Reparo</option>
                 <option value="triagem">Triagem</option>
                 <option value="solicitacao_de_peca">Solicitação de peça</option>
+                <option value="reparo">Reparo</option>
                 <option value="orcamento_gerado">Orçamento gerado</option>
                 <option value="saw">SAW</option>
                 <option value="reparo_recusado">Reparo recusado</option>
-                <option value="oqc">OQC</option>
+                <option value="reparo_completo">Reparo Completo</option>
               </select>
             </label>
 
@@ -56,36 +56,9 @@
         <canvas id="pieChart"></canvas>
       </section>
 
-      <section class="card month-history-card" id="monthlyHistorySection">
-        <h2>Histórico Mensal</h2>
-        <p class="muted">Clique em um mês para filtrar a tabela e os gráficos.</p>
-        <div class="months-grid" id="monthsGrid"></div>
-      </section>
-
-      <section class="toolbar card">
-        <div class="toolbar-left" style="width:100%">
-          <label class="search" style="width:100%">
-            <input type="text" id="searchInput" placeholder="Filtrar por número da OS, tipo ou colaborador..." />
-          </label>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Data/Hora</th>
-                <th>Número da OS</th>
-                <th>Colaborador</th>
-                <th>Tipo</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="entriesTableBody">
-              <!-- Registros renderizados via JS -->
-            </tbody>
-          </table>
+      <section class="board-container">
+        <div class="board" id="board">
+          <!-- Colunas e cartões renderizados via JS -->
         </div>
       </section>
     </main>
@@ -98,5 +71,3 @@
     <script src="assets/app.js"></script>
   </body>
 </html>
-
-
