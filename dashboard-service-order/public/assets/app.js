@@ -1,5 +1,5 @@
 (() => {
-  const STORAGE_KEY = 'dashboardEntries';
+  const API_URL = 'http://localhost:3000'; // URL do nosso backend
   const WORK_TYPES = [
     { key: 'triagem', label: 'Triagem', color: '#34d399' },
     { key: 'solicitacao_de_peca', label: 'Solicitação de peça', color: '#fbbf24' },
@@ -23,19 +23,63 @@
   const board = document.getElementById('board');
   let pieChartInstance = null;
 
-  function loadEntriesFromStorage() {
+  // --- Funções de API ---
+  async function fetchEntries() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      entries = raw ? JSON.parse(raw) : [];
+      const response = await fetch(`${API_URL}/items`);
+      if (!response.ok) {
+        throw new Error('Falha ao buscar dados da API');
+      }
+      return await response.json();
     } catch (err) {
-      console.error('Erro ao ler dados do storage', err);
-      entries = [];
+      console.error('Erro ao buscar dados:', err);
+      showNotification('❌ Erro ao carregar dados do servidor.', 'error');
+      return []; // Retorna array vazio em caso de erro
     }
   }
 
-  function saveEntriesToStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  async function postEntry(entry) {
+    try {
+      const response = await fetch(`${API_URL}/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      });
+      if (!response.ok) {
+        throw new Error('Falha ao salvar o registro.');
+      }
+      return await response.json();
+    } catch (err) {
+      console.error('Erro ao salvar registro:', err);
+      showNotification('❌ Erro ao salvar o registro.', 'error');
+      return null;
+    }
   }
+  
+  async function updateEntryAPI(entry) {
+    // O DynamoDB usa put para criar e atualizar, então a chamada é a mesma.
+    // O ID garante que o item correto seja sobrescrito.
+    return await postEntry(entry);
+  }
+
+  async function deleteEntryAPI(id) {
+    try {
+      // Nota: O endpoint de exclusão não foi implementado no backend de exemplo.
+      // Isso é uma demonstração de como seria a chamada no front-end.
+      const response = await fetch(`${API_URL}/items/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Falha ao excluir o registro.');
+      }
+      return true;
+    } catch (err) {
+      console.error('Erro ao excluir registro:', err);
+      showNotification('❌ Erro ao excluir o registro.', 'error');
+      return false;
+    }
+  }
+
 
   function resetForm() {
     osNumberInput.value = '';
@@ -52,6 +96,11 @@
   function getTypeLabel(typeKey) {
     const t = WORK_TYPES.find((t) => t.key === typeKey);
     return t ? t.label : typeKey;
+  }
+
+  function renderAll() {
+    renderStats();
+    renderBoard();
   }
 
   function renderStats() {
@@ -170,9 +219,10 @@
       .replace(/'/g, '&#039;');
   }
 
-  function addEntry(osNumber, type, collaborator) {
+  async function addEntry(osNumber, type, collaborator) {
     const now = new Date().toISOString();
     const entry = {
+      // O ID deve ser a chave de partição no DynamoDB
       id: `${now}-${Math.random().toString(36).slice(2, 8)}`,
       osNumber: osNumber,
       type: type,
@@ -180,25 +230,22 @@
       timestamp: now,
     };
     
-    entries.push(entry);
-    saveEntriesToStorage();
-    renderStats();
-    renderBoard();
-    
-    showNotification('✅ Registro adicionado com sucesso!', 'success');
+    const result = await postEntry(entry);
+    if (result) {
+      entries.push(result.item);
+      renderAll();
+      showNotification('✅ Registro adicionado com sucesso!', 'success');
+    }
   }
   
   function showNotification(message, type = 'info') {
-    // Remove notificação existente
     const existing = document.querySelector('.notification');
     if (existing) existing.remove();
     
-    // Cria nova notificação
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
     
-    // Adiciona estilos
     notification.style.cssText = `
       position: fixed;
       top: 20px;
@@ -213,7 +260,6 @@
       word-wrap: break-word;
     `;
     
-    // Cores baseadas no tipo
     const colors = {
       success: '#10b981',
       error: '#ef4444',
@@ -222,11 +268,8 @@
     };
     
     notification.style.backgroundColor = colors[type] || colors.info;
-    
-    // Adiciona ao DOM
     document.body.appendChild(notification);
     
-    // Remove após 5 segundos
     setTimeout(() => {
       if (notification.parentNode) {
         notification.style.animation = 'slideOut 0.3s ease-in';
@@ -239,34 +282,41 @@
     }, 5000);
   }
 
-  function deleteEntryById(id) {
-    const idx = entries.findIndex((e) => e.id === id);
-    if (idx >= 0) {
-      entries.splice(idx, 1);
-      saveEntriesToStorage();
-      renderStats();
-      renderBoard();
-      showNotification('🗑️ Registro excluído com sucesso!', 'info');
-    }
+  async function deleteEntryById(id) {
+    // Nota: A rota DELETE precisa ser implementada no backend.
+    // Por enquanto, vamos apenas remover do front-end para manter a UI funcional.
+    // const success = await deleteEntryAPI(id);
+    // if (success) {
+      const idx = entries.findIndex((e) => e.id === id);
+      if (idx >= 0) {
+        entries.splice(idx, 1);
+        renderAll();
+        showNotification('🗑️ Registro excluído (localmente)!', 'info');
+      }
+    // }
   }
 
+  // A função de apagar tudo precisaria de um endpoint específico no backend.
+  // Por simplicidade, vamos desativá-la por enquanto.
   function clearAll() {
-    if (!confirm('Tem certeza que deseja apagar todos os registros?')) return;
-    entries = [];
-    saveEntriesToStorage();
-    renderStats();
-    renderBoard();
-    showNotification('🗑️ Todos os registros foram excluídos!', 'info');
+    showNotification('Função desativada na versão com backend.', 'warning');
+    // if (!confirm('Tem certeza que deseja apagar todos os registros?')) return;
+    // entries = [];
+    // renderAll();
   }
 
-  function updateEntryType(id, newType) {
+  async function updateEntryType(id, newType) {
     const entry = entries.find(e => e.id === id);
     if (entry) {
       entry.type = newType;
-      saveEntriesToStorage();
-      renderStats();
-      renderBoard();
-      showNotification(`Status da OS ${entry.osNumber} alterado para ${getTypeLabel(newType)}`, 'success');
+      const result = await updateEntryAPI(entry);
+      if (result) {
+        renderAll();
+        showNotification(`Status da OS ${entry.osNumber} alterado para ${getTypeLabel(newType)}`, 'success');
+      } else {
+        // Reverte a mudança se a API falhar
+        entry.type = entries.find(e => e.id === id).type; 
+      }
     }
   }
 
@@ -323,7 +373,7 @@
     });
   }
 
-  // Eventos
+  // --- Eventos ---
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const osNumber = osNumberInput.value.trim();
@@ -343,8 +393,11 @@
     if (action === 'delete') deleteEntryById(id);
   });
 
-  // Init
-  loadEntriesFromStorage();
-  renderStats();
-  renderBoard();
+  // --- Inicialização ---
+  async function initializeApp() {
+    entries = await fetchEntries();
+    renderAll();
+  }
+
+  initializeApp();
 })();
